@@ -1,0 +1,21 @@
+[project]
+name = "pimo-agent-core"
+version = "0.1.0"
+description = "Pimo Agent 运行时 — Agent Loop、状态管理、会话树、上下文压缩"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+dependencies = [
+    "pimo-ai",
+    "aiofiles>=24.0",
+]
+
+[tool.uv.sources]
+pimo-ai = { workspace = true }
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

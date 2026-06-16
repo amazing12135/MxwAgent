@@ -1,0 +1,26 @@
+[project]
+name = "pimo-coding-agent"
+version = "0.1.0"
+description = "Pimo Coding Agent — CLI 入口、内置工具集、扩展系统、配置管理"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+dependencies = [
+    "pimo-agent-core",
+    "pimo-ai",
+    "aiofiles>=24.0",
+]
+
+[tool.uv.sources]
+pimo-agent-core = { workspace = true }
+pimo-ai = { workspace = true }
+
+[project.scripts]
+pimo = "pimo.coding_agent.cli:main"
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

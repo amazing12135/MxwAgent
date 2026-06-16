@@ -1,0 +1,39 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Test coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# Sessions (runtime data)
+.sessions/
+
+# Temporary files
+*.tmp
+*.bak

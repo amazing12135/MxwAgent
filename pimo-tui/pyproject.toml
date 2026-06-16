@@ -1,0 +1,26 @@
+[project]
+name = "pimo-tui"
+version = "0.1.0"
+description = "Pimo 终端 UI — 基于 prompt_toolkit + Rich 的交互界面"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+dependencies = [
+    "pimo-coding-agent",
+    "pimo-agent-core",
+    "pimo-ai",
+    "prompt-toolkit>=3.0",
+    "rich>=13.0",
+]
+
+[tool.uv.sources]
+pimo-coding-agent = { workspace = true }
+pimo-agent-core = { workspace = true }
+pimo-ai = { workspace = true }
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
