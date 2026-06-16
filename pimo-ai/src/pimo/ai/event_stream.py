@@ -11,6 +11,9 @@ from collections.abc import AsyncIterator
 
 from pimo.ai.types import AssistantMessage, AssistantMessageEvent
 
+# 私有哨兵：标记流结束，__aiter__ 遇到此对象时退出迭代
+_SENTINEL = object()
+
 
 class AssistantMessageEventStream:
     """基于 asyncio.Queue 的异步事件流。
@@ -35,39 +38,61 @@ class AssistantMessageEventStream:
 
     def __init__(self) -> None:
         """初始化空事件流。"""
-        ...
+        self._queue: asyncio.Queue[AssistantMessageEvent | object] = asyncio.Queue()
+        self._result_future: asyncio.Future[AssistantMessage] = asyncio.Future()
+        self._done: bool = False
 
     def push(self, event: AssistantMessageEvent) -> None:
         """推送一个事件到流中。
 
         由 Provider 调用。事件按推送顺序被消费者消费。
+        流已结束后（``end()`` 已被调用）的推送被静默丢弃。
+
+        若推送的是 DoneEvent 或 ErrorEvent，自动标记流结束并解析
+        ``result()``，等效于先 ``push(event)`` 再 ``end(event.message)``。
+        其后入队的哨兵确保消费者迭代正常退出。
 
         Args:
             event: 归一化后的 AssistantMessageEvent。
         """
-        ...
+        if self._done:
+            return
+        self._queue.put_nowait(event)
+        if event.type in ("done", "error"):
+            self._done = True
+            if not self._result_future.done():
+                self._result_future.set_result(event.message)
+            self._queue.put_nowait(_SENTINEL)
 
     def end(self, message: AssistantMessage) -> None:
         """标记流结束并设置最终结果。
 
         由 Provider 在所有事件推送完毕后调用。调用后消费者无法再接收
-        新事件，``result()`` 解析为该 message。
+        新事件，``result()`` 解析为该 message。重复调用无副作用。
 
         Args:
             message: 流结束后最终定型的 AssistantMessage。
         """
-        ...
+        if self._done:
+            return
+        self._done = True
+        self._result_future.set_result(message)
+        self._queue.put_nowait(_SENTINEL)
 
     async def __aiter__(self) -> AsyncIterator[AssistantMessageEvent]:
         """异步迭代流中的所有事件。
 
         消费者通过 ``async for event in stream:`` 使用。
-        迭代在流结束（``end()`` 被调用）且所有已推送事件被消费后自动退出。
+        迭代在流结束且所有已推送事件被消费后自动退出。
 
         Yields:
             AssistantMessageEvent: 按推送顺序的下一个事件。
         """
-        ...
+        while True:
+            event = await self._queue.get()
+            if event is _SENTINEL:
+                return
+            yield event  # type: ignore[attr-defined]
 
     async def result(self) -> AssistantMessage:
         """等待流结束并获取最终 AssistantMessage。
@@ -76,6 +101,6 @@ class AssistantMessageEventStream:
         若流尚未结束则阻塞等待。
 
         Returns:
-            由 ``end()`` 设置的最终 AssistantMessage。
+            由 ``end()`` 或终止事件（DoneEvent/ErrorEvent）设置的最终消息。
         """
-        ...
+        return await self._result_future
