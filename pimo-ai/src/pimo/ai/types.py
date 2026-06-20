@@ -36,6 +36,8 @@ class ThinkingContent:
     type: Literal["thinking"] = "thinking"
     thinking: str
     signature: str | None = None
+    redacted: bool = False
+    """True 表示思考内容被省略，仅保留加密签名。"""
 
 
 @dataclass(kw_only=True)
@@ -120,6 +122,8 @@ class AssistantMessage:
     usage: Usage
     stop_reason: str
     error_message: str | None = None
+    response_id: str | None = None
+    """API 响应 ID (如 Anthropic message.id)，用于追踪."""
     timestamp: float = 0.0
 
 
@@ -256,12 +260,30 @@ class StreamOptions:
     """取消信号（如 asyncio.Event）。Provider 应定期检查."""
     transport: str = "auto"
     """传输方式：'auto' | 'sse' | 'websocket'."""
+    temperature: float | None = None
+    """采样温度。与 Anthropic extended thinking 互斥."""
+    max_tokens: int | None = None
+    """最大输出 token 数。为 None 时使用 model.max_tokens."""
+    cache_retention: str | None = None
+    """缓存保留策略：'none' | 'short' | 'long'."""
+    session_id: str | None = None
+    """会话 ID，用于 session-based caching."""
+    headers: dict[str, str] | None = None
+    """附加 HTTP 头。合并到 Provider 默认头之上."""
+    timeout_ms: int | None = None
+    """HTTP 请求超时（毫秒）."""
+    websocket_connect_timeout_ms: int | None = None
+    """WebSocket 连接超时（毫秒）."""
+    max_retries: int | None = None
+    """最大重试次数."""
+    max_retry_delay_ms: int | None = None
+    """Provider 请求重试延迟上限（毫秒）."""
     on_payload: Callable[[dict[str, Any]], None] | None = None
     """请求 payload 回调（用于日志/调试）."""
     on_response: Callable[[dict[str, Any]], None] | None = None
     """响应回调（用于日志/调试）."""
-    max_retry_delay_ms: int | None = None
-    """Provider 请求重试延迟上限（毫秒）."""
+    metadata: dict[str, Any] | None = None
+    """附加元数据。各厂商提取其理解的字段（如 user_id）."""
 
 
 @dataclass(kw_only=True)
