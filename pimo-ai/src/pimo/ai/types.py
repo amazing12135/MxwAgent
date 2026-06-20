@@ -167,6 +167,8 @@ class Model:
     """上下文窗口大小（token 数）."""
     max_tokens: int
     """单次最大输出 token 数."""
+    thinking_level_map: dict[str, Any] | None = None
+    """思考级别 → 厂商原生参数映射。None 表示不支持该级别."""
     compat: dict[str, Any] | None = None
     """厂商兼容性差异配置."""
 
