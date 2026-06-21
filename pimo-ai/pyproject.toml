@@ -8,6 +8,7 @@ license = { text = "MIT" }
 dependencies = [
     "anthropic>=0.39.0",
     "openai>=1.0.0",
+    "jsonschema>=4.0",
 ]
 
 [build-system]
