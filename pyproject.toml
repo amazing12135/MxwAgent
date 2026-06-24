@@ -7,6 +7,7 @@ members = ["pimo-ai", "pimo-agent-core", "pimo-coding-agent", "pimo-tui"]
 # 共享开发依赖 — 所有 workspace 成员可用
 [dependency-groups]
 dev = [
+    "pyright>=1.1.410",
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
     "pytest-cov>=5.0",
