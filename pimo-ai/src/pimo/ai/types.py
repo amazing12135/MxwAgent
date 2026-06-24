@@ -178,13 +178,28 @@ class Model:
 
 
 @dataclass(kw_only=True)
+class Tool:
+    """LLM 可调用工具的基础定义。包含 JSON Schema 参数描述。
+
+    AgentTool（定义在 pimo-agent-core）扩展此类，增加执行逻辑和 UI 元数据。
+    """
+
+    name: str
+    """工具名称，LLM 通过此名称发起 toolCall。"""
+    description: str
+    """工具描述，帮助 LLM 决定何时调用。"""
+    parameters: dict[str, Any]
+    """JSON Schema 格式的参数定义。"""
+
+
+@dataclass(kw_only=True)
 class Context:
     """统一 LLM 调用上下文。"""
 
     system_prompt: str | None
     messages: list[Message]
-    tools: list[dict[str, Any]] | None = None
-    """JSON Schema 格式的工具定义列表."""
+    tools: list[Tool] | None = None
+    """可用工具列表。为 None 表示不传递工具。"""
 
 # =============================================================================
 # 流式事件协议 (6 种统一事件)

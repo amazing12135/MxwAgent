@@ -25,6 +25,7 @@ from pimo.ai.types import (
     Model,
     SimpleStreamOptions,
     StreamOptions,
+    Tool,
 )
 
 # 触发内置 Provider 自动注册
